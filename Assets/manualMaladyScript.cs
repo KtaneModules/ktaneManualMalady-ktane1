@@ -132,7 +132,7 @@ public class manualMaladyScript : MonoBehaviour
     void shufflerHandler(int k)
     {
         if (isAnimating || moduleSolved) { return; }
-        if (selected == -1) { selected = k; audio.PlaySoundAtTransform("Select", transform);        }
+        if (selected == -1) { selected = k; audio.PlaySoundAtTransform("Select", transform); }
         else
         {
             Material tempMat = audioShufflers[k].GetComponent<MeshRenderer>().material;
@@ -227,6 +227,7 @@ public class manualMaladyScript : MonoBehaviour
         else
         {
             screenText.color = Color.white;
+            screenText.characterSize = 1f;
             screenText.text = "MODULE SOLVED";
             while (delta < 5f)
             {
@@ -270,23 +271,74 @@ public class manualMaladyScript : MonoBehaviour
         return newClip;
     }
 
-    /*Twitch plays
+    //Twitch Plays
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"";
+    private readonly string TwitchHelpMessage = @"<!{0} play> to play the audio clips, <!{0} submit> to submit the current order, <!{0} swap 1 2> to swap the 1st and 2nd buttons, multiple swaps can be done by separating each pair with a semicolon, e.g. <!{0} swap 1 2;3 4;5 6>";
     #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
         command = command.ToLowerInvariant().Trim();
-        Match m = Regex.Match(command, @"^()$");
+        var parameters = command.Split(' ');
         yield return null;
+        if (Regex.IsMatch(command, @"^\s*play\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            button.OnInteract();
+            yield return null;
+        }
+        else if (Regex.IsMatch(command, @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            if (isAnimating) { yield return "sendtochaterror The module is playing audio clips right now."; yield break; }
+            submit.OnInteract();
+            yield return null;
+        }
+        else if (Regex.IsMatch(parameters[0], @"^\s*swap\s*", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            if (isAnimating) { yield return "sendtochaterror The module is playing audio clips right now."; yield break; }
+            command = command.Substring(4).Trim();
+            var pairs = command.Split(';').Select(a => a.Trim()).ToArray();
+            foreach (string s in pairs)
+            {
+                var b = s.Split();
+                if (b.Length != 2) { yield return "sendtochaterror Invalid command, please try again!"; yield break; }
+                for (int i = 0; i < b.Length; i++)
+                {
+                    int n = 0;
+                    bool c = int.TryParse(b[i], out n);
+                    if (!c) { yield return "sendtochaterror Invalid button to swap, please try again!"; yield break; }
+                    if (n < 1 || n > 8)
+                    {
+                        yield return "sendtochaterror Invalid button to swap, please try again!"; yield break;
+                    }
+                }
+            }
+            for (int i = 0; i < pairs.Length; i++)
+            {
+                for (int j = 0; j < 3; j += 2)//Funny way of getting 0th and 2nd character of each pair
+                {
+                    audioShufflers[pairs[i][j] - '0' - 1].GetComponent<KMSelectable>().OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                }
+            }
+        }
+        else { yield return "sendtochaterror Invalid command, please try again!"; yield break; }
     }
-    */
 
-    /*Force Solve Handler
     IEnumerator TwitchHandleForcedSolve()
     {
+        while (!moduleSolved)
+        {
+            if (isAnimating) { button.OnInteract(); yield return null; }
+            for (int i = 0; i < 8; i++)
+            {
+                audioShufflers[i].GetComponent<KMSelectable>().OnInteract();
+                yield return null;
+                audioShufflers[shuffler.IndexOf(i)].GetComponent<KMSelectable>().OnInteract();
+                yield return null;
+            }
+            submit.OnInteract();
+            yield return null;
+        }
         yield return null;
     }
-    */
 }
