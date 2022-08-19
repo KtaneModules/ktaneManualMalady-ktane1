@@ -89,7 +89,8 @@ public class manualMaladyScript : MonoBehaviour
         if (audioSource.isPlaying) 
         { 
             audioSource.Stop(); 
-            StopCoroutine("player"); 
+            StopCoroutine("player");
+            screenText.text = "";
             isAnimating = false;
             Debug.LogFormat("<Manual Malady #{0}> Play button pressed while audio clips are played, stopping audio clips...", moduleId);
             return; 
@@ -157,6 +158,9 @@ public class manualMaladyScript : MonoBehaviour
         {
             //audioSource.clip = moduleNames[selectedModule];
             //audioSource.time = dividedLength * shuffler[i];
+            screenText.color = Color.white;
+            screenText.characterSize = 1f;
+            screenText.text = "PLAYING";
             audioSource.clip = MakeSubclip(moduleNames[selectedModule], dividedLength * shuffler[i], dividedLength);
             audioSource.Play();
             while (audioSource.isPlaying)
@@ -168,13 +172,13 @@ public class manualMaladyScript : MonoBehaviour
                 yield return null;
             }
         }
-
+        screenText.text = "";
         isAnimating = false;
     }
 
     IEnumerator resizeName(string k)
     {
-        while (!moduleSolved)//For some reason the code won't work when it's only ran once
+        while (!audioSource.isPlaying)//For some reason the code won't work when it's only ran once
         {
             float width = 0;
             foreach (char symbol in k)
@@ -211,6 +215,8 @@ public class manualMaladyScript : MonoBehaviour
         Color c = new Color();
         if (!moduleSolved)
         {
+            screenText.text = moduleNames[selectedModule].name;
+            StartCoroutine(resizeName(screenText.text));
             screenText.color = Color.white;
             yield return new WaitForSeconds(1.2f);
             audio.PlaySoundAtTransform("Glitch", transform);
