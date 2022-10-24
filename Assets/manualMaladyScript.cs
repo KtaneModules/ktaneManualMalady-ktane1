@@ -158,7 +158,7 @@ public class manualMaladyScript : MonoBehaviour
         {
             //audioSource.clip = moduleNames[selectedModule];
             //audioSource.time = dividedLength * shuffler[i];
-            screenText.color = Color.white;
+            screenText.color = audioShufflers[i].GetComponent<MeshRenderer>().material.color;
             screenText.characterSize = 1f;
             screenText.text = "PLAYING";
             audioSource.clip = MakeSubclip(moduleNames[selectedModule], dividedLength * shuffler[i], dividedLength);
