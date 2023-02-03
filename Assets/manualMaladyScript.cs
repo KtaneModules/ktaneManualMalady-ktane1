@@ -88,13 +88,15 @@ public class manualMaladyScript : MonoBehaviour
         audio.PlaySoundAtTransform("Press", transform);
         if (audioSource.isPlaying) 
         { 
-            audioSource.Stop(); 
+            audioSource.Stop();
             StopCoroutine("player");
             screenText.text = "";
             isAnimating = false;
             Debug.LogFormat("<Manual Malady #{0}> Play button pressed while audio clips are played, stopping audio clips...", moduleId);
             return; 
         }
+        StopCoroutine("displayAnim");
+        screenText.color = Color.black;
         Debug.LogFormat("<Manual Malady #{0}> Play button pressed, playing audio clips from left to right...", moduleId);
         StartCoroutine("player");
     }
@@ -118,7 +120,7 @@ public class manualMaladyScript : MonoBehaviour
             audio.PlaySoundAtTransform("Solve", transform);
             Debug.LogFormat("[Manual Malady #{0}] The clips are in the correct order, module solved!", moduleId);
             moduleSolved = true;
-            StartCoroutine(displayAnim());
+            StartCoroutine("displayAnim");
             for (int i = 0; i < audioShufflers.Length; i++)
                 StartCoroutine(buttonAnim(i));
         }
@@ -126,7 +128,7 @@ public class manualMaladyScript : MonoBehaviour
         {
             module.HandleStrike();
             Debug.LogFormat("[Manual Malady #{0}] The clips are in the wrong order, strike!", moduleId);
-            StartCoroutine(displayAnim());
+            StartCoroutine("displayAnim");
         }
     }
 
