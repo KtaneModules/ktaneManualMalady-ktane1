@@ -18,10 +18,12 @@ MonoBehaviour:
 
     Special thanks to BlvdBroken for the module name.
 
+    Also special thanks to _Play_ and GoodHood for one of the audio clips.
+
 
     Mod ID: manualMalady
 
     Manual Link: https://ktane.timwi.de/HTML/Manual%20Malady.html'
-  version: v1.4.2
+  version: v1.4.5
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 9919fd047a4ef9746a26ea4178bf6b87, type: 3}
